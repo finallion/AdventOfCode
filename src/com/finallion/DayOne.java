@@ -45,6 +45,7 @@ public class DayOne implements Day {
                     currentCalories += Integer.parseInt(line);
                 }
             }
+            bufferedReader.close();
 
         } catch (Exception e) {
             e.printStackTrace();
