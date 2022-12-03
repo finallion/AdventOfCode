@@ -30,7 +30,7 @@ public class DayTwo implements Day {
 
             String line;
             while ((line = bufferedReader.readLine()) != null) {
-                // day two
+                // part two
                 switch (line) {
                     case "A X" -> score += 0 + 3;
                     case "A Y" -> score += 3 + 1;
@@ -43,7 +43,7 @@ public class DayTwo implements Day {
                     case "C Z" -> score += 6 + 1;
                 }
 
-                // day one
+                // part one
                 /*
                 switch (line) {
                     case "A X" -> score += 3 + 1;

@@ -3,7 +3,7 @@ package com.finallion;
 public class Main {
 
     public static void main(String[] args) {
-        DayTwo day = new DayTwo();
+        DayThree day = new DayThree();
         day.partOne();
         day.partTwo();
 
