@@ -74,7 +74,6 @@ public class DayNine implements Day {
         }
     }
 
-
     public void readFile(int part) {
         try {
             List<String> lines = Files.readAllLines(Path.of(buildPath("Nine")));
