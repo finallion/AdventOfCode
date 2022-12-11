@@ -13,7 +13,6 @@ public class DayTen implements Day {
     private char[][] crt = new char[6][40];
     private int row = 0;
 
-
     @Override
     public void partOne() {
         //readFile();
