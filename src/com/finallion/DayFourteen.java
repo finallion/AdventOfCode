@@ -15,13 +15,11 @@ public class DayFourteen implements Day {
     public void partOne() {
         /*
         readFile(true);
-        printCaveSystem();
 
         while (sandFall) {
-            new Sand(0, 500);
+            new Sand(0, 500, true);
         }
-        printCaveSystem();
-        System.out.println("Result: " + sandCounter);
+        System.out.println("Result: " + (sandCounter - 1));
 
          */
     }
@@ -29,19 +27,16 @@ public class DayFourteen implements Day {
     @Override
     public void partTwo() {
         readFile(false);
-        printCaveSystem();
 
         while (sandFall) {
-            new Sand(0, 500);
+            new Sand(0, 500, false);
 
             if (cave[0][500] == 'o') {
                 sandFall = false;
             }
         }
-        System.out.println("---------------");
-        printCaveSystem();
-        System.out.println("Result: " + sandCounter);
 
+        System.out.println("Result: " + sandCounter);
     }
 
     public void readFile(boolean partOne) {
@@ -80,39 +75,30 @@ public class DayFourteen implements Day {
 
     }
 
-    private void printCaveSystem() {
-        for (int i = 0; i <= bounds[0]; i++) {
-            for (int ii = bounds[1]; ii <= bounds[2]; ii++) {
-                System.out.print(cave[i][ii] + " ");
-            }
-            System.out.println();
-        }
-    }
-
     class Sand {
         int posRow;
         int posCol;
+        boolean partOne;
 
-        public Sand(int x, int y) {
+        public Sand(int x, int y, boolean partOne) {
             posRow = x;
             posCol = y;
+            this.partOne = partOne;
 
             move(x, y);
         }
 
         private boolean inBounds(int x, int y) {
-
-            if (x < 0 || x >= bounds[0]) {
-                return false;
+            if (partOne) {
+                if (x < 0 || x >= bounds[0] + 1 || y < bounds[1] - 1 || y >= bounds[2] + 1) {
+                    sandFall = false;
+                    return false;
+                }
+            } else {
+                if (x < 0 || x >= bounds[0]) { // remove vertical bounds
+                    return false;
+                }
             }
-
-            /* part one
-            if (x < 0 || x >= bounds[0] + 1 || y < bounds[1] - 1 || y >= bounds[2] + 1) {
-                return false;
-            }
-
-             */
-
             return true;
         }
 
@@ -156,20 +142,15 @@ public class DayFourteen implements Day {
         private void move(int x, int y) {
             if (sandFall) {
                 if (fallDown(x, y)) {
-
                 } else if (fallLeftDiagonal(x, y)) {
-
                 } else if (fallRightDiagonal(x, y)) {
-
                 } else {
                     if (free(x, y)) {
                         cave[x][y] = 'o';
                         sandCounter++;
                     }
-
                 }
             }
         }
-
     }
 }
