@@ -53,6 +53,7 @@ public class DayFourteen implements Day {
                     int endY = Integer.parseInt(coords[ii + 1].split(",")[0]);
                     int endX = Integer.parseInt(coords[ii + 1].split(",")[1]);
 
+                    // unnecessary, but helpful for printing out the cave
                     if (Math.max(startX, endX) > bounds[0]) bounds[0] = Math.max(startX, endX);
                     if (Math.min(startY, endY) < bounds[1]) bounds[1] = Math.min(startY, endY);
                     if (Math.max(startY, endY) > bounds[2]) bounds[2] = Math.max(startY, endY);
