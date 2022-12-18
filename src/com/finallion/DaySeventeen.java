@@ -44,6 +44,7 @@ public class DaySeventeen implements Day {
             for (int ii = 0; ii < gameFieldInList.size() - 21; ii++) {
                 if (i == ii) continue;
 
+                // could use a for loop...
                 if (gameFieldInList.get(i).equals(gameFieldInList.get(ii)) &&
                         gameFieldInList.get(i + 1).equals(gameFieldInList.get(ii + 1)) &&
                         gameFieldInList.get(i + 2).equals(gameFieldInList.get(ii + 2)) &&
