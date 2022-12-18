@@ -1,36 +1,81 @@
 package com.finallion;
 
-import javax.swing.text.Position;
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileReader;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.*;
-import java.util.regex.Pattern;
 
 public class DaySeventeen implements Day {
     private Set<Position> gameField = new HashSet<>();
     private boolean landed = false;
+    private List<String> gameFieldInList = new ArrayList<>();
+    private int rockIndexOfPatternStart = 0;
+    private int rockIndexOfPatternEnd = 0;
+    private int patternStartIndex = 0;
+    private int patternEndIndex = 0;
+    private int patternLength = 0;
 
     @Override
     public void partOne() {
-        readFile(true, 2023, 0);
-        System.out.println(getHighestRock());
+        //readFile(true, 2023, 0);
+        //printGameField();
+        //System.out.println(getHighestRock());
     }
 
     @Override
     public void partTwo() {
-        // after x stones at height y start a recurring pattern with stone length a and height b.
-        // solve ((1000000000000L - x) / a) * b + y;
+        getStartOfPatternIndex();
+        gameField.clear();
+        readFile(false, 5000);
+        System.out.println("Pattern start at height: " + patternStartIndex + " at stone: " + rockIndexOfPatternStart);
+        System.out.println("Pattern ends at height: " + patternEndIndex + " at stone: " + rockIndexOfPatternEnd);
+        System.out.println("Pattern has length of: " + patternLength + " with " + (rockIndexOfPatternEnd - rockIndexOfPatternStart) + " stones");
 
-        // pattern start somewhere around stone 976 and has a length of estimated 770 stones
+        // solution: 1581449275319
+        // mine: 1581449275328, off by 9
+        System.out.println(((1000000000000L - patternLength) / (rockIndexOfPatternEnd - (rockIndexOfPatternStart))) * patternLength + patternLength + patternStartIndex + rockIndexOfPatternStart);
 
-        readFile(false, 1746, 976);
     }
 
-    public void readFile(boolean partOne, long bounds, int cycleStart) {
+    private void getStartOfPatternIndex() {
+        readFile(true, 5000);
+        printGameField();
+
+        for (int i = 0; i < gameFieldInList.size() - 21; i++) {
+            for (int ii = 0; ii < gameFieldInList.size() - 21; ii++) {
+                if (i == ii) continue;
+
+                if (gameFieldInList.get(i).equals(gameFieldInList.get(ii)) &&
+                        gameFieldInList.get(i + 1).equals(gameFieldInList.get(ii + 1)) &&
+                        gameFieldInList.get(i + 2).equals(gameFieldInList.get(ii + 2)) &&
+                        gameFieldInList.get(i + 3).equals(gameFieldInList.get(ii + 3)) &&
+                        gameFieldInList.get(i + 4).equals(gameFieldInList.get(ii + 4)) &&
+                        gameFieldInList.get(i + 5).equals(gameFieldInList.get(ii + 5)) &&
+                        gameFieldInList.get(i + 6).equals(gameFieldInList.get(ii + 6)) &&
+                        gameFieldInList.get(i + 7).equals(gameFieldInList.get(ii + 7)) &&
+                        gameFieldInList.get(i + 8).equals(gameFieldInList.get(ii + 8)) &&
+                        gameFieldInList.get(i + 9).equals(gameFieldInList.get(ii + 9)) &&
+                        gameFieldInList.get(i + 10).equals(gameFieldInList.get(ii + 10)) &&
+                        gameFieldInList.get(i + 11).equals(gameFieldInList.get(ii + 11)) &&
+                        gameFieldInList.get(i + 12).equals(gameFieldInList.get(ii + 12)) &&
+                        gameFieldInList.get(i + 13).equals(gameFieldInList.get(ii + 13)) &&
+                        gameFieldInList.get(i + 14).equals(gameFieldInList.get(ii + 14)) &&
+                        gameFieldInList.get(i + 15).equals(gameFieldInList.get(ii + 15)) &&
+                        gameFieldInList.get(i + 16).equals(gameFieldInList.get(ii + 16)) &&
+                        gameFieldInList.get(i + 17).equals(gameFieldInList.get(ii + 17)) &&
+                        gameFieldInList.get(i + 18).equals(gameFieldInList.get(ii + 18)) &&
+                        gameFieldInList.get(i + 19).equals(gameFieldInList.get(ii + 19)) &&
+                        gameFieldInList.get(i + 20).equals(gameFieldInList.get(ii + 20))
+                        ) {
+                    patternStartIndex = i + 2; // add two because first line is ground and pattern starts after this match
+                    patternLength = ii - i;
+                    patternEndIndex = ii;
+                    return;
+                }
+            }
+        }
+    }
+
+    public void readFile(boolean partOne, long bounds) {
         for (int i = 0; i < 7; i++) {
             gameField.add(new Position(i, 0));
         }
@@ -51,10 +96,17 @@ public class DaySeventeen implements Day {
                     charCounter = 0;
                 }
 
+
+                if (!partOne && (getHighestRock() == patternStartIndex)) {
+                    rockIndexOfPatternStart = (int) maxRocks + 1; // add current rock
+                }
+
+                if (!partOne && (getHighestRock() == patternEndIndex)) {
+                    rockIndexOfPatternEnd = (int) maxRocks + 3; // add two because of previous rockIndexOfPatternStart and one for the actual pattern end
+                    return;
+                }
+
                 if (landed) {
-                    if (maxRocks == cycleStart && !partOne) {
-                        System.out.println(getHighestRock());
-                    }
                     maxRocks++;
                     type++;
                     type = type % 5;
@@ -82,7 +134,7 @@ public class DaySeventeen implements Day {
     }
 
     private void printGameField() {
-        char[][] field = new char[2733][7];
+        char[][] field = new char[10000][7];
         for (int i = 0; i < field.length; i++) {
             for (int ii = 0; ii < field[0].length; ii++) {
                 field[i][ii] = '.';
@@ -94,12 +146,17 @@ public class DaySeventeen implements Day {
         }
 
         for (int i = 0; i < field.length; i++) {
+            String line = "";
+            //System.out.print(i + " ");
             for (int ii = 0; ii < field[0].length; ii++) {
+                line += field[i][ii];
                 System.out.print(field[i][ii]);
             }
+            gameFieldInList.add(line);
+
             System.out.println();
         }
-        System.out.println("----------");
+        //System.out.println("----------");
     }
 
     class Rock {
