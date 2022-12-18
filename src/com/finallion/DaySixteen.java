@@ -4,9 +4,11 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.*;
 
+// Thanks to https://github.com/dirk527/aoc2021/blob/main/src/aoc2022/Day16.java for the main ideas
 public class DaySixteen implements Day {
     private Graph graph = new Graph();
     private Set<Valve> workingValves = new HashSet<>();
+    private Valve start;
 
     @Override
     public void partOne() {
@@ -16,45 +18,88 @@ public class DaySixteen implements Day {
             valve.findPaths(workingValves);
         }
 
-        for (Valve valve : graph.adjVertices.keySet()) {
-            System.out.println(valve.distances);
-        }
+        start = graph.getVertex("AA");
+        start.findPaths(workingValves);
 
-        /*
-         List<StateP1> stack = new LinkedList<>();
-        stack.add(new StateP1(start, 30, 0, new ArrayList<>()));
+        List<StateP1> stack = new LinkedList<>();
+        stack.add(new StateP1(start, 30, 0, new ArrayList<>())); // init state
+
         int best = 0;
-        while (!stack.isEmpty()) {
+        while (!stack.isEmpty()) { // BFS
             StateP1 state = stack.remove(0);
             boolean terminal = true;
-            for (var way : state.cur.ways.entrySet()) {
-                Integer dist = way.getValue();
+
+            for (Map.Entry<Valve, Integer> way : state.current.distances.entrySet()) {
+                Integer distance = way.getValue();
                 Valve target = way.getKey();
-                if (state.minutes - dist > 0 && !state.opened.contains(target)) {
+
+                if (state.minutes - distance > 0 && !state.opened.contains(target)) {
                     ArrayList<Valve> opened = new ArrayList<>(state.opened);
                     opened.add(target);
-                    int newlyReleased = (state.minutes - dist) * target.flow;
+                    int newlyReleased = (state.minutes - distance) * target.flowRate;
                     terminal = false;
-//                    System.out.println("at " + state + " using way " + target + "/" + dist + " freshly releasing " + newlyReleased);
-                    stack.add(new StateP1(target, state.minutes - dist, state.released + newlyReleased, opened));
+                    stack.add(new StateP1(target, state.minutes - distance, state.released + newlyReleased, opened));
                 }
             }
             if (terminal) {
                 if (state.released > best) {
-//                    System.out.println("new best: " + state);
                     best = state.released;
                 }
             }
         }
-        System.out.println("part 1: " + best);
-         */
-
+        System.out.println("Best route releases: " + best + " pressure.");
     }
 
 
     @Override
     public void partTwo() {
+        Player startHuman = new Player(start, 26);
+        Player startElephant = new Player(start, 26);
+        List<StateP2> stack = new LinkedList<>();
 
+        stack.add(new StateP2(startHuman, startElephant, 0, new ArrayList<>()));
+        int best = 0;
+        while (!stack.isEmpty()) {
+            StateP2 state = stack.remove(0);
+
+            // always move the player that is behind in time, or the human if tied
+            boolean moveElephant = state.elephant.minutes > state.human.minutes;
+            boolean terminal = addMoves(stack, state, moveElephant);
+
+            // if the mover cannot move, maybe the other Player still can
+            if (terminal) {
+                terminal = addMoves(stack, state, !moveElephant);
+            }
+
+            if (terminal) {
+                if (state.released > best) {
+                    best = state.released;
+                }
+            }
+            System.out.println("Best: " + best + " with size: " + stack.size());
+        }
+        System.out.println("Best route releases: " + best + " pressure.");
+    }
+
+    private static boolean addMoves(List<StateP2> stack, StateP2 state, boolean moveElephant) {
+        boolean terminal = true;
+        Player mover = moveElephant ? state.elephant : state.human;
+
+        for (Map.Entry<Valve, Integer> way : mover.current.distances.entrySet()) {
+            Integer dist = way.getValue();
+            Valve target = way.getKey();
+
+            if (mover.minutes - dist > 0 && !state.opened.contains(target)) {
+                ArrayList<Valve> opened = new ArrayList<>(state.opened);
+                opened.add(target);
+                int newlyReleased = (mover.minutes - dist) * target.flowRate;
+                terminal = false;
+                Player newPlayer = new Player(target, mover.minutes - dist);
+                stack.add(new StateP2(moveElephant ? state.human : newPlayer, moveElephant ? newPlayer : state.elephant, state.released + newlyReleased, opened));
+            }
+        }
+
+        return terminal;
     }
 
     public void readFile() {
@@ -73,7 +118,6 @@ public class DaySixteen implements Day {
                     workingValves.add(valve);
                 }
             }
-
 
             for (int i = 0; i < lines.size(); i++) {
                 String line = lines.get(i);
@@ -116,7 +160,6 @@ public class DaySixteen implements Day {
     private class Valve {
         int flowRate;
         String name;
-        boolean open = false;
         public Map<Valve, Integer> distances = new HashMap<>();
 
         public Valve(String name, int flowRate) {
@@ -126,25 +169,28 @@ public class DaySixteen implements Day {
 
         public void findPaths(Set<Valve> workingValves) {
             List<Valve> stack = new LinkedList<>();
-            HashMap<Valve, Integer> distances = new HashMap<>();
             Set<Valve> visited = new HashSet<>();
+            HashMap<Valve, Integer> distances = new HashMap<>();
             stack.add(this);
             distances.put(this, 0);
-            while (!stack.isEmpty() && distances.size() < workingValves.size()) {
-                Valve cur = stack.remove(0);
-                visited.add(cur);
-                Integer curDist = distances.get(cur);
-                if (cur != this && workingValves.contains(cur)) {
-                    distances.put(cur, curDist + 1); // the way takes curDist minutes; +1 minute for opening the valve
+
+            while (!stack.isEmpty() && this.distances.size() < workingValves.size()) {
+                Valve currentValve = stack.remove(0);
+                visited.add(currentValve);
+                Integer currentDistance = distances.get(currentValve);
+                if (currentValve != this && workingValves.contains(currentValve)) {
+                    this.distances.put(currentValve, currentDistance + 1); // the way takes currentDistance minutes; + 1 minute for opening the valve
                 }
 
-                for (Valve v : graph.adjVertices.get(cur)) {
+                for (Valve v : graph.adjVertices.get(currentValve)) {
                     if (!visited.contains(v)) {
                         stack.add(v);
-                        distances.put(v, curDist + 1);
+                        distances.put(v, currentDistance + 1);
                     }
                 }
             }
+
+            System.out.println("For valve: " + this + " collect paths: " + distances);
         }
 
         @Override
@@ -170,4 +216,13 @@ public class DaySixteen implements Day {
             return name;
         }
     }
+
+    record StateP1(Valve current, int minutes, int released, Collection<Valve> opened) { }
+
+    record StateP2(Player human, Player elephant, int released, Collection<Valve> opened) { }
+
+    record Player(Valve current, int minutes) { }
+
+
+
 }
