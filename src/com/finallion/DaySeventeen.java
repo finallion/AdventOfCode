@@ -82,7 +82,7 @@ public class DaySeventeen implements Day {
         }
 
         try {
-            List<String> lines = Files.readAllLines(Path.of(buildPath("17")));
+            List<String> lines = Files.readAllLines(Path.of(buildPath("Seventeen")));
             int type = 0;
             int movement;
             Rock rock = new Rock(type, 2, 4); // start at 4 because layer 1 is bottom

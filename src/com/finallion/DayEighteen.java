@@ -100,7 +100,7 @@ public class DayEighteen implements Day {
 
     public void readFile() {
         try {
-            List<String> lines = Files.readAllLines(Path.of(buildPath("18")));
+            List<String> lines = Files.readAllLines(Path.of(buildPath("Eighteen")));
 
             for (int i = 0; i < lines.size(); i++) {
                 String[] coords = lines.get(i).split(",");
