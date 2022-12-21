@@ -9,71 +9,80 @@ public class DayTwenty implements Day {
 
     @Override
     public void partOne() {
-        List<Node> input = readFile();
+        List<Node> input = readFile(true);
+
         for (int i = 0; i < input.size(); i++) {
-            Node current = new Node(-1,-1);
-            for (Node node : input) {
-                if (node.index == i) {
-                    current = node;
+            Node current = new Node(-1, -1);
+            int currentIndex = - 1;
+
+            for (int ii = 0; ii < input.size(); ii++) {
+                if (input.get(ii).index == i) {
+                    current = input.get(ii);
+                    currentIndex = ii;
                 }
             }
-            if (current.index == -1) {
-                break;
-            }
-            System.out.println("Current: " + current);
 
-            int pos;
-            if (current.value > 0) {
-                pos = current.value + i;
-                while (pos >= input.size()) {
-                    pos -= input.size() - 1;
-                }
-            } else {
-                pos = current.value - i;
-                while (pos < 0) {
-                    pos += input.size() - 1;
-                }
-            }
-            System.out.println("Wants at pos: " + pos);
+            input.remove(currentIndex);
+            input.add(Math.floorMod(current.value + currentIndex, input.size()), current);
 
-
-            Node last = input.get(input.size() - 1);
-            System.out.println("Last node: " + last);
-            System.out.println("Input before shift: " + input);
-            // shift all from pos one pos right
-            for (int ii = input.size() - 1; ii >= pos; ii--) {
-                System.out.println("-------Shifting: " + input.get(ii) + " and " + input.get(ii - 1));
-                input.set(ii, input.get(ii - 1));
-            }
-
-            System.out.println("Input after 1st shift: " + input);
-            // add our node to its place
-            input.set(pos, current);
-            System.out.println("Input after adding: " + input);
-
-            // shift all from 0 one pos right
-            // add the previous last one back to pos 0
-            for (int ii = pos - 1; ii > 0; ii--) {
-                input.set(ii, input.get(ii - 1));
-            }
-            System.out.println("Input after shifting 2: " + input);
-            input.set(0, last);
-            System.out.println("Input after adding last: " + input);
+            //printPretty(input);
         }
 
-        System.out.println(input);
+        int zeroIndex = input.indexOf(input.stream().filter(n -> n.value == 0).findFirst().get());
+        long v1 = input.get((zeroIndex + 1000) % input.size()).value;
+        long v2 = input.get((zeroIndex + 2000) % input.size()).value;
+        long v3 = input.get((zeroIndex + 3000) % input.size()).value;
+
+        System.out.println("Result: " + (v1 + v2 + v3));
+    }
+
+    private void printPretty(List<Node> nodes) {
+        for (Node node : nodes) {
+            System.out.print(node.value + " ");
+        }
+        System.out.println();
     }
 
     @Override
     public void partTwo() {
+        List<Node> input = readFile(false);
+
+        for (int i = 0; i < 10; i++) {
+            for (int ii = 0; ii < input.size(); ii++) {
+                Node current = new Node(-1, -1);
+                int currentIndex = -1;
+
+                for (int iii = 0; iii < input.size(); iii++) {
+                    if (input.get(iii).index == ii) {
+                        current = input.get(iii);
+                        currentIndex = iii;
+                    }
+                }
+
+                input.remove(currentIndex);
+                input.add(Math.floorMod(current.value + currentIndex, input.size()), current);
+            }
+        }
+
+
+        int zeroIndex = input.indexOf(input.stream().filter(n -> n.value == 0).findFirst().get());
+        long v1 = input.get((zeroIndex + 1000) % input.size()).value;
+        long v2 = input.get((zeroIndex + 2000) % input.size()).value;
+        long v3 = input.get((zeroIndex + 3000) % input.size()).value;
+
+        System.out.println("Result: " + (v1 + v2 + v3));
     }
 
-    public List<Node> readFile() {
+    public List<Node> readFile(boolean partOne) {
         List<Node> input = new ArrayList<>();
         try {
             List<String> lines = Files.readAllLines(Path.of(buildPath("Twenty")));
             for (int i = 0; i < lines.size(); i++) {
-                input.add(new Node(i, Integer.parseInt(lines.get(i))));
+                long value = Integer.parseInt(lines.get(i));
+                if (!partOne) {
+                    value *= 811589153;
+                }
+                input.add(new Node(i, value));
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -81,18 +90,7 @@ public class DayTwenty implements Day {
         return input;
     }
 
-    class Node {
-        int index;
-        int value;
-
-        public Node(int index, int value) {
-            this.index = index;
-            this.value = value;
-        }
-
-        @Override
-        public String toString() {
-            return value + "";
-        }
+    record Node(int index, long value) {
     }
 }
+
