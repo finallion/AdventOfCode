@@ -60,6 +60,6 @@ public class Position<E> {
 
     @Override
     public String toString() {
-        return "[" + x + "," + y + "]";
+        return "[" + y + "," + x + "]";
     }
 }
