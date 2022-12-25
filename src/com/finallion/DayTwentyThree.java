@@ -1,6 +1,6 @@
 package com.finallion;
 
-import com.finallion.util.Position;
+import com.finallion.util.Pos;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -9,7 +9,7 @@ import java.util.stream.Collectors;
 
 public class DayTwentyThree implements Day {
     List<Elf> elves = new ArrayList<>();
-    Map<Position, Integer> proposedPositionList = new HashMap<>();
+    Map<Pos, Integer> proposedPositionList = new HashMap<>();
     int lowerBound;
     int rightBound;
 
@@ -140,7 +140,7 @@ public class DayTwentyThree implements Day {
 
 
     private void proposeDirection(Elf elf) {
-        Map<Direction, Position> neighboringElvesPos = elf.neighboringElvesPos;
+        Map<Direction, Pos> neighboringElvesPos = elf.neighboringElvesPos;
 
         if (neighboringElvesPos.containsKey(Direction.N) &&
                 neighboringElvesPos.containsKey(Direction.NE) &&
@@ -168,18 +168,18 @@ public class DayTwentyThree implements Day {
     }
 
     private void findNeighboringElves(Elf elf) {
-        elf.neighboringElvesPos.put(Direction.NE, new Position(elf.currentPos.getX() - 1, elf.currentPos.getY() + 1));
-        elf.neighboringElvesPos.put(Direction.N, new Position(elf.currentPos.getX() - 1, elf.currentPos.getY()));
-        elf.neighboringElvesPos.put(Direction.NW, new Position(elf.currentPos.getX() - 1, elf.currentPos.getY() - 1));
-        elf.neighboringElvesPos.put(Direction.E, new Position(elf.currentPos.getX(), elf.currentPos.getY() + 1));
-        elf.neighboringElvesPos.put(Direction.W, new Position(elf.currentPos.getX(), elf.currentPos.getY() - 1));
-        elf.neighboringElvesPos.put(Direction.SE, new Position(elf.currentPos.getX() + 1, elf.currentPos.getY() + 1));
-        elf.neighboringElvesPos.put(Direction.S, new Position(elf.currentPos.getX() + 1, elf.currentPos.getY()));
-        elf.neighboringElvesPos.put(Direction.SW, new Position(elf.currentPos.getX() + 1, elf.currentPos.getY() - 1));
+        elf.neighboringElvesPos.put(Direction.NE, new Pos(elf.currentPos.getX() - 1, elf.currentPos.getY() + 1));
+        elf.neighboringElvesPos.put(Direction.N, new Pos(elf.currentPos.getX() - 1, elf.currentPos.getY()));
+        elf.neighboringElvesPos.put(Direction.NW, new Pos(elf.currentPos.getX() - 1, elf.currentPos.getY() - 1));
+        elf.neighboringElvesPos.put(Direction.E, new Pos(elf.currentPos.getX(), elf.currentPos.getY() + 1));
+        elf.neighboringElvesPos.put(Direction.W, new Pos(elf.currentPos.getX(), elf.currentPos.getY() - 1));
+        elf.neighboringElvesPos.put(Direction.SE, new Pos(elf.currentPos.getX() + 1, elf.currentPos.getY() + 1));
+        elf.neighboringElvesPos.put(Direction.S, new Pos(elf.currentPos.getX() + 1, elf.currentPos.getY()));
+        elf.neighboringElvesPos.put(Direction.SW, new Pos(elf.currentPos.getX() + 1, elf.currentPos.getY() - 1));
 
 
         // remove positions with elves on
-        for (Position elfPos : elves.stream().map(e -> e.currentPos).collect(Collectors.toList())) {
+        for (Pos elfPos : elves.stream().map(e -> e.currentPos).collect(Collectors.toList())) {
             elf.neighboringElvesPos.keySet().removeIf(key -> elfPos.equals(elf.neighboringElvesPos.get(key)));
         }
     }
@@ -193,7 +193,7 @@ public class DayTwentyThree implements Day {
             for (int i = 0; i < lines.size(); i++) {
                 for (int ii = 0; ii < lines.get(0).length(); ii++) {
                     if (lines.get(i).charAt(ii) == '#') {
-                        elves.add(new Elf(new Position<>(i, ii)));
+                        elves.add(new Elf(new Pos<>(i, ii)));
                     }
                 }
             }
@@ -208,15 +208,15 @@ public class DayTwentyThree implements Day {
     }
 
     class Elf {
-        Position currentPos;
-        Position updatedPos = null;
+        Pos currentPos;
+        Pos updatedPos = null;
         List<Direction> directions = new ArrayList<>();
         Direction movedToDirection;
         boolean canMove = false;
-        Map<Direction, Position> neighboringElvesPos = new HashMap<>();
-        Map<Direction, Position> proposedPositions = new HashMap<>();
+        Map<Direction, Pos> neighboringElvesPos = new HashMap<>();
+        Map<Direction, Pos> proposedPositions = new HashMap<>();
 
-        public Elf(Position currentPos) {
+        public Elf(Pos currentPos) {
             this.currentPos = currentPos;
             directions.add(Direction.N);
             directions.add(Direction.S);

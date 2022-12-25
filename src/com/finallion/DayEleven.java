@@ -13,7 +13,7 @@ public class DayEleven implements Day {
     public void partOne() {
         /*
         readFile();
-        for (int i = 0; i < 20; i++) {
+        for (int row = 0; row < 20; row++) {
             for (int ii = 0; ii < monkeys.size(); ii++) {
                 Monkey monkey = monkeys.get(ii);
                 while (!monkey.items.isEmpty()) {

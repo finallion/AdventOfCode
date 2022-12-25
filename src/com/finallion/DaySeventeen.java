@@ -148,7 +148,7 @@ public class DaySeventeen implements Day {
 
         for (int i = 0; i < field.length; i++) {
             String line = "";
-            //System.out.print(i + " ");
+            //System.out.print(row + " ");
             for (int ii = 0; ii < field[0].length; ii++) {
                 line += field[i][ii];
                 System.out.print(field[i][ii]);

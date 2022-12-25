@@ -1,65 +1,72 @@
 package com.finallion.util;
 
-import java.util.List;
+import com.finallion.DayTwentyFour;
+
 import java.util.Objects;
 
-public class Position<E> {
-    private int x;
-    private int y;
-    private E data;
-    int[][] offsets = new int[][]{{-1, -1}, {-1, 0}, {-1, 1}, {0, -1}, {0, 1}, {1, -1}, {0, 1}, {1,1}};
+public final class Position implements Comparable<Position> {
 
-    public Position(int x, int y) {
-        this.x = x;
-        this.y = y;
-        this.data = null;
+    public int row() {
+        return row;
     }
 
-    public Position(int x, int y, E data) {
-        this.x = x;
-        this.y = y;
-        this.data = data;
+    public int col() {
+        return col;
     }
 
-    public E getData() {
-        return data;
+    private final int row;
+    private final int col;
+
+    private Position(int row, int col) {
+        this.row = row;
+        this.col = col;
     }
 
-    public void setData(E data) {
-        this.data = data;
+    public boolean isValid(int maxRow, int maxCol) {
+        return this.row >= 0 && this.col >= 0 && this.row < maxRow && this.col < maxCol;
     }
 
-    public int getX() {
-        return x;
+    public static Position of(int i, int j) {
+        return new Position(i, j);
     }
 
-    public void setX(int x) {
-        this.x = x;
+    public Position moveLeft() {
+        return new Position(row, col - 1);
     }
 
-    public int getY() {
-        return y;
+    public Position moveRight() {
+        return new Position(row, col + 1);
     }
 
-    public void setY(int y) {
-        this.y = y;
+    public Position moveUp() {
+        return new Position(row - 1, col);
     }
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        Position<?> position = (Position<?>) o;
-        return x == position.x && y == position.y;
+    public Position moveDown() {
+        return new Position(row + 1, col);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(x, y);
+        return Objects.hash(row, col);
     }
 
     @Override
-    public String toString() {
-        return "[" + y + "," + x + "]";
+    public boolean equals(Object another) {
+        if (this == another) return true;
+        return another instanceof Position && equalTo((Position) another);
+    }
+
+    private boolean equalTo(Position another) {
+        return Objects.equals(row, another.row) && Objects.equals(col, another.col);
+    }
+
+    @Override
+    public int compareTo(Position p) {
+        int value = this.row - p.row;
+        if (value == 0) {
+            value = this.col - p.col;
+        }
+        return value;
     }
 }

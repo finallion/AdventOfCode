@@ -66,7 +66,7 @@ public class DayFive implements Day {
 
                     // part one
                     /*
-                    for (int i = 0; i < howMany; i++) {
+                    for (int row = 0; row < howMany; row++) {
                         String crate = stacks.get(from - 1).pollLast();
                         stacks.get(to - 1).addLast(crate);
                     }
